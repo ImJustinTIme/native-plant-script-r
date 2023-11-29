@@ -1,8 +1,10 @@
 # Load the required libraries
 library(readxl)
 library(rvest)
+library(tibble)
 # Define the URL of the website
 
+base_url <- "https://plants.ces.ncsu.edu/plants/"
 grabExcelPlantNames <- function(fileName) {
   xl <- read_excel(fileName)
   xl
@@ -50,17 +52,31 @@ scrap_ncsu_website <- function(url) {
 
 args <- commandArgs(trailingOnly = TRUE)
 
-length(args) > 0
-if (length(args) > 0) {
-  "went through"
-  # process_file <- grabExcelPlantNames(args[1])
-  # process_file
-  excel_sheets(args[1])
-  xl <- read_excel(args[1])
-  xl
-  url <- "https://plants.ces.ncsu.edu/plants/silene-virginica/"
-  # df_save <- scrap_ncsu_website(url)
-  # df_save
-} else {
-  "Please supply an xlsx file to go through"
+# process_file <- grabExcelPlantNames(args[1])
+# process_file
+excel_sheets(args[1])
+xl <- read_excel(args[1])
+plant_name_list <- as.list(xl[, 2])[[1]]
+working_tribble <- tibble(
+  "Common Name" = NULL,
+  "Scientific Name" = NULL,
+  "Deciduous/Evergreen" = NULL,
+  "Type" = NULL,
+  "Size" = NULL,
+  "Flower" = NULL,
+  "Bloom" = NULL,
+  "Sun/Shade" = NULL,
+  "Soil" = NULL,
+  "Type" = NULL,
+  "Moist/Dry" = NULL,
+  "Picture" = NULL
+)
+
+plant_name_list
+for (i in seq_along(plant_name_list)) {
+  pn <- plant_name_list[[i]]
+  url <- paste(base_url, gsub(" ", "-", pn), sep = "")
+  print(url)
+  df_save <- scrap_ncsu_website(url)
+  df_save
 }
